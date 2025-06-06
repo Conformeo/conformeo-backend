@@ -23,13 +23,15 @@ print(f"[CONFIG] ACCESS_TOKEN_EXPIRE_MINUTES = {settings.ACCESS_TOKEN_EXPIRE_MIN
 origins = [
     "http://localhost",
     "http://localhost:4200",
+    # si besoin, ajouter d’autres domaines de dev ou staging :
+    # "http://127.0.0.1:4200",
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,        # Origines autorisées en développement
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=origins,        # origines autorisées
+    allow_credentials=True,       # autoriser l’envoi de cookies / credentials
+    allow_methods=["*"],          # autoriser toutes les méthodes HTTP (GET, POST, etc.)
+    allow_headers=["*"],          # autoriser tous les headers
 )
 
 # --- Endpoint racine (facultatif, mais pratique pour tester) ---
