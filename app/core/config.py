@@ -1,0 +1,25 @@
+# backend/app/core/config.py
+
+from pydantic_settings import BaseSettings
+from pydantic.networks import PostgresDsn
+
+class Settings(BaseSettings):
+    # --- Base de données ---
+    DATABASE_URL: PostgresDsn
+
+    # --- Sécurité / JWT ---
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+
+    # --- Feature flags (exemple) ---
+    FEATURE_X_ENABLED: bool = False
+
+    # --- Log Niveau ou autre config éventuelle ---
+    LOG_LEVEL: str = "info"
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+
+settings = Settings()

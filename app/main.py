@@ -5,12 +5,19 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Import du router health
 from app.routers.health import router as health_router
+from app.core.config import settings  # <-- Import des settings
+
 
 app = FastAPI(
     title="Mon App MVP",
     description="API FastAPI - Sprint 1: structure initiale et endpoint /health",
     version="0.1.0"
 )
+
+# Exemple d’utilisation : afficher dans la console la DATABASE_URL lors du démarrage
+print(f"[CONFIG] DATABASE_URL = {settings.DATABASE_URL}")
+print(f"[CONFIG] ACCESS_TOKEN_EXPIRE_MINUTES = {settings.ACCESS_TOKEN_EXPIRE_MINUTES}")
+
 
 # --- Configuration CORS (exemple minimal) ---
 origins = [
