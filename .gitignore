@@ -1,0 +1,8 @@
+__pycache__/
+.pytest_cache
+*.py[cod]
+*.sqlite3
+env/
+.env
+.vscode/
+*.log
