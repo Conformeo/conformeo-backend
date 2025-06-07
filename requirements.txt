@@ -1,4 +1,4 @@
-fastapi==0.106.0
+fastapi[all]
 uvicorn[standard]==0.23.2
 python-dotenv==1.0.0
 pydantic>=2.0
@@ -6,10 +6,11 @@ SQLAlchemy>=1.4
 alembic>=1.8
 psycopg2-binary
 httpx==0.23.3
-passlib[bcrypt]==1.7.4
 email-validator>=2.0
 python-multipart>=0.0.5
 pytest
 pytest-asyncio
 python-jose>=3.0.0
 passlib[bcrypt]>=1.7.4
+
+
