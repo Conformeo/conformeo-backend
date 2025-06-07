@@ -26,3 +26,16 @@ class UserRead(BaseModel):
 
     class Config:
         orm_mode = True
+
+class UserUpdate(BaseModel):
+    """
+    Schéma pour mettre à jour un utilisateur :
+    - email : optionnel, doit être une adresse valide
+    - password : optionnel, au moins 8 caractères
+    """
+    email: Annotated[EmailStr, Field(default=None)]
+    password: Annotated[str, Field(default=None, min_length=8)]
+    
+    class Config:
+        orm_mode = True
+        extra = "forbid"  # Interdit les champs supplémentaires non définis dans le schéma
