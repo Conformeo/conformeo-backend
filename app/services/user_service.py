@@ -55,3 +55,11 @@ def update_user(db: Session, user: User, user_in: UserUpdate) -> User:
     db.commit()
     db.refresh(user)
     return user
+
+
+def delete_user(db: Session, user: User) -> None:
+    """
+    Supprime l’utilisateur passé en argument.
+    """
+    db.delete(user)
+    db.commit()
