@@ -16,7 +16,7 @@ def test_settings_load(tmp_path, monkeypatch):
     env_file = tmp_path / ".env"
     env_content = "\n".join(
         [
-            "DATABASE_URL=postgresql://user:password@localhost:5432",
+            "DATABASE_URL=/user:password@localhost:5432",
             "SECRET_KEY=testsecret",
             "ACCESS_TOKEN_EXPIRE_MINUTES=120",
             "FEATURE_X_ENABLED=True",
@@ -30,7 +30,7 @@ def test_settings_load(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
     # *** Patch critique ici ***
-    os.environ["DATABASE_URL"] = "postgresql://localhost:5432"
+    os.environ["DATABASE_URL"] = "/localhost:5432"
     # (si tu veux être encore plus clean, tu peux aussi patcher les autres dans os.environ)
 
     # 3. Instancier Settings : il doit lire le .env que l'on vient de créer
