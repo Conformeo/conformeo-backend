@@ -1,3 +1,10 @@
 [flake8]
 max-line-length = 120
 extend-ignore = E302, E305, W291, W292, W293, W391, F401
+
+# Exclure le dossier alembic (migrations) du lint
+exclude =
+    .git,
+    __pycache__,
+    alembic,
+    alembic/versions
