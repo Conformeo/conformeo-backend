@@ -1,11 +1,12 @@
 # backend/app/core/config.py
 import os
 from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv(), override=True)
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic.networks import AnyUrl
-from pydantic_settings import SettingsConfigDict
+
+# Charger .env en override
+load_dotenv(find_dotenv(), override=True)
 
 
 class Settings(BaseSettings):
