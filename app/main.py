@@ -7,7 +7,9 @@ from app.routers.health import router as health_router
 from app.routers.auth import router as auth_router
 from app.routers.users import router as users_router
 
-from app.core.config import settings
+from app.core.config import Settings
+
+settings = Settings()
 
 app = FastAPI(
     title="Mon App MVP", description="API FastAPI - Sprint 1…", version="0.1.0"

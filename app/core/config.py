@@ -1,31 +1,31 @@
 # backend/app/core/config.py
-import os
-from dotenv import load_dotenv, find_dotenv
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 from pydantic.networks import AnyUrl
-
-# Charger .env en override
-load_dotenv(find_dotenv(), override=True)
+import os
 
 
 class Settings(BaseSettings):
-    # indique à Pydantic de lire le fichier .env
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    """
+    Charge un fichier .env à l'instanciation (override des env vars existantes),
+    puis laisse Pydantic lire les env vars (qui viennent du .env si présent).
+    """
 
-    # --- Base de données ---
     DATABASE_URL: AnyUrl
-
-    # --- Sécurité / JWT ---
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
-
-    # --- Feature flags (exemple) ---
     FEATURE_X_ENABLED: bool = False
-
-    # --- Log Niveau ou autre config éventuelle ---
     LOG_LEVEL: str = "info"
 
+    def __init__(self, **kwargs):
+        # Recharge le .env **après** le cwd ait été modifié (monkeypatch.chdir)
+        from dotenv import load_dotenv, find_dotenv
 
-settings = Settings()
+        # find_dotenv() cherche un .env à partir du cwd courant
+        load_dotenv(find_dotenv(), override=True)
+        super().__init__(**kwargs)
+
+
+# Remarquez qu'on n'instancie plus globalement ici :
+# settings = Settings()

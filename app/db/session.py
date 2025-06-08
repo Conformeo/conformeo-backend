@@ -3,7 +3,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from app.core.config import settings
+from app.core.config import Settings
+
+settings = Settings()
 
 # Création de l'engine : il se connecte à PostgreSQL via la variable d'environnement DATABASE_URL
 engine = create_engine(
