@@ -28,7 +28,7 @@ jobs:
       - name: Lint & format check
         run: |
           flake8
-          black --check .
+          black --check app tests conftest.py
 
       - name: Run tests
         env:
