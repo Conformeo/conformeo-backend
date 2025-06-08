@@ -23,9 +23,5 @@ class Settings(BaseSettings):
     # --- Log Niveau ou autre config éventuelle ---
     LOG_LEVEL: str = "info"
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-
 
 settings = Settings()
