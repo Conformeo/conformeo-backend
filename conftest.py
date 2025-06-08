@@ -7,9 +7,19 @@ from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
 # Importer les objets du projet
-from app.db.session import Base, get_db
+from app.db.session import Base, get_db, engine
 from app.models.user import User
 from app.main import app  # L'instance FastAPI
+
+
+@pytest.fixture(scope="session", autouse=True)
+def prepare_database():
+    # Crée toutes les tables avant les tests
+    Base.metadata.create_all(bind=engine)
+    yield
+    # (Optionnel : drop les tables à la fin)
+    Base.metadata.drop_all(bind=engine)
+
 
 # 1) On crée un engine "in-memory" pour SQLite
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
