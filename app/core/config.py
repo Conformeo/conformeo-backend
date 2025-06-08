@@ -7,10 +7,7 @@ from pydantic_settings import SettingsConfigDict
 
 class Settings(BaseSettings):
     # indique à Pydantic de lire le fichier .env
-    model_config = SettingsConfigDict(
-        env_file='.env',
-        env_file_encoding='utf-8'
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     # --- Base de données ---
     DATABASE_URL: AnyUrl
