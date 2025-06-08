@@ -34,4 +34,3 @@ def test_settings_load(tmp_path, monkeypatch):
 
     # 4. Assertions (on compare str() pour DATABASE_URL)
     assert str(settings.DATABASE_URL) == "***localhost:5432/db_test"
-
