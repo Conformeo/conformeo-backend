@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
+
 @router.get("/", summary="Statut de santé de l'API")
 def ping():
     """
@@ -11,6 +12,3 @@ def ping():
     - Renvoie {"status": "OK"} si l'API est opérationnelle.
     """
     return {"status": "OK"}
-
-
-

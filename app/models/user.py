@@ -4,10 +4,12 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from datetime import datetime
 from app.db.session import Base
 
+
 class User(Base):
     """
     Modèle SQLAlchemy représentant la table 'users'.
     """
+
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -16,5 +18,3 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     date_created = Column(DateTime, default=datetime.utcnow)
     is_admin = Column(Boolean, default=False)
-    
-

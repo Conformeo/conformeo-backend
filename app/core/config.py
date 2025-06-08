@@ -3,6 +3,7 @@
 from pydantic_settings import BaseSettings
 from pydantic.networks import PostgresDsn
 
+
 class Settings(BaseSettings):
     # --- Base de données ---
     DATABASE_URL: PostgresDsn
@@ -21,5 +22,6 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+
 
 settings = Settings()

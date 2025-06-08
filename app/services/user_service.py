@@ -12,11 +12,13 @@ from app.core.security import get_password_hash
 # Contexte de hachage de mot de passe (bcrypt)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def get_user_by_email(db: Session, email: str) -> User | None:
     """
     Recherche un utilisateur par email.
     """
     return db.query(User).filter(User.email == email).first()
+
 
 def get_user_by_id(db: Session, user_id: int) -> User | None:
     """
@@ -32,11 +34,7 @@ def create_user(db: Session, user_in: UserCreate) -> User:
     - Ajoute en base via SQLAlchemy.
     """
     hashed_pwd = pwd_context.hash(user_in.password)
-    db_user = User(
-        email=user_in.email,
-        hashed_password=hashed_pwd,
-        is_active=True
-    )
+    db_user = User(email=user_in.email, hashed_password=hashed_pwd, is_active=True)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

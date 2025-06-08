@@ -4,19 +4,22 @@ import os
 import pytest
 from app.core.config import Settings
 
+
 def test_settings_load(tmp_path, monkeypatch):
     """
     Vérifie que Settings lit correctement les variables d'environnement depuis un fichier .env.
     """
     # 1. Créer un fichier .env temporaire
     env_file = tmp_path / ".env"
-    env_content = "\n".join([
-        "DATABASE_URL=postgresql://user:pass@localhost:5432/db_test",
-        "SECRET_KEY=testsecret",
-        "ACCESS_TOKEN_EXPIRE_MINUTES=120",
-        "FEATURE_X_ENABLED=True",
-        "LOG_LEVEL=debug"
-    ])
+    env_content = "\n".join(
+        [
+            "DATABASE_URL=postgresql://user:pass@localhost:5432/db_test",
+            "SECRET_KEY=testsecret",
+            "ACCESS_TOKEN_EXPIRE_MINUTES=120",
+            "FEATURE_X_ENABLED=True",
+            "LOG_LEVEL=debug",
+        ]
+    )
     env_file.write_text(env_content)
 
     # 2. Forcer Pydantic à utiliser ce dossier temporaire comme CWD

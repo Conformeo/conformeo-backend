@@ -27,7 +27,7 @@ jobs:
 
       - name: Lint & format check
         run: |
-          flake8 app tests
+          flake8
           black --check .
 
       - name: Run tests

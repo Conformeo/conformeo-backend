@@ -11,6 +11,7 @@ from app.schemas.user import UserCreate, UserRead
 
 router = APIRouter(tags=["auth"])
 
+
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
     """
@@ -22,7 +23,9 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     # 1) Vérifier si l'email est déjà utilisé
     existing = db.query(User).filter(User.email == user_in.email).first()
     if existing:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email déjà utilisé")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email déjà utilisé"
+        )
 
     # 2) Créer l'utilisateur
     hashed_pwd = get_password_hash(user_in.password)
@@ -36,8 +39,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login")
 def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
     """
     Connexion d'un utilisateur :
