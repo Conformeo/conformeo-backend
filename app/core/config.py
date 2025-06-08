@@ -3,6 +3,8 @@
 from pydantic_settings import BaseSettings
 from pydantic.networks import AnyUrl
 import os
+from app.core.config import Settings
+
 
 
 class Settings(BaseSettings):

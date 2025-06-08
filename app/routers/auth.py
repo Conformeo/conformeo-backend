@@ -8,6 +8,9 @@ from app.core.security import verify_password, create_access_token, get_password
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.user import UserCreate, UserRead
+from app.core.config import Settings
+
+settings = Settings()
 
 router = APIRouter(tags=["auth"])
 
