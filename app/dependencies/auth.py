@@ -5,10 +5,11 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 
-from app.core.config import settings
 from app.core.security import oauth2_scheme
 from app.db.session import get_db
 from app.models.user import User
+from app.core.config import Settings
+settings = Settings()
 
 
 def get_current_user(
