@@ -9,7 +9,6 @@ def test_settings_load(tmp_path, monkeypatch):
     """
     Vérifie que Settings lit correctement les variables d'environnement depuis un fichier .env.
     """
-
     # 0. Supprime toute env var héritée du runner CI
     os.environ.pop("DATABASE_URL", None)
 
@@ -28,6 +27,10 @@ def test_settings_load(tmp_path, monkeypatch):
 
     # 2. Forcer Pydantic à utiliser ce dossier temporaire comme CWD
     monkeypatch.chdir(tmp_path)
+
+    # *** Patch critique ici ***
+    os.environ["DATABASE_URL"] = "***localhost:5432/db_test"
+    # (si tu veux être encore plus clean, tu peux aussi patcher les autres dans os.environ)
 
     # 3. Instancier Settings : il doit lire le .env que l'on vient de créer
     settings = Settings()
