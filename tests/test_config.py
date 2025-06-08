@@ -9,7 +9,6 @@ def test_settings_load(tmp_path, monkeypatch):
     """
     Vérifie que Settings lit correctement les variables d'environnement depuis un fichier .env.
     """
-    import os
 
     # 0. Supprime toute env var héritée du runner CI
     os.environ.pop("DATABASE_URL", None)
