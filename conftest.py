@@ -19,10 +19,9 @@ engine_test = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}, echo=False
 )
 
-# SessionLocalTest :  
-SessionLocalTest = sessionmaker(
-    autocommit=False, autoflush=False, bind=engine_test
-)
+# SessionLocalTest :
+SessionLocalTest = sessionmaker(autocommit=False, autoflush=False, bind=engine_test)
+
 
 # 2) Fixture qui crée la table "users" en mémoire AVANT chaque test de module
 #    et détruit la table APRES
@@ -32,6 +31,7 @@ def setup_test_db():
     Base.metadata.create_all(bind=engine_test)
     yield  # Après le yield, le teardown pourra se faire
     Base.metadata.drop_all(bind=engine_test)  # Nettoyage
+
 
 # 3) Fixture pour obtenir une session SQLAlchemy "test"
 @pytest.fixture(scope="function")
@@ -58,6 +58,7 @@ def client(db_session):
     Cette fixture démarre un TestClient FastAPI dont la dépendance get_db()
     renverra toujours une session SQLite in-memory (via db_session).
     """
+
     # Fonction qui remplace get_db()
     def override_get_db():
         try:
