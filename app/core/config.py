@@ -1,12 +1,12 @@
 # backend/app/core/config.py
 
 from pydantic_settings import BaseSettings
-from pydantic.networks import PostgresDsn
+from pydantic.networks import AnyUrl
 
 
 class Settings(BaseSettings):
     # --- Base de données ---
-    DATABASE_URL: PostgresDsn
+    DATABASE_URL: AnyUrl
 
     # --- Sécurité / JWT ---
     SECRET_KEY: str
