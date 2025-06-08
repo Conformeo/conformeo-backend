@@ -9,6 +9,7 @@ from app.core.security import oauth2_scheme
 from app.db.session import get_db
 from app.models.user import User
 from app.core.config import Settings
+
 settings = Settings()
 
 
