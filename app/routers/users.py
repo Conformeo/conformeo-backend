@@ -44,8 +44,6 @@ def read_user_by_id(
     return target
 
 
-
-
 @router.put(
     "/{user_id}",
     response_model=UserRead,

@@ -16,4 +16,5 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     date_created = Column(DateTime, default=datetime.utcnow)
     is_admin = Column(Boolean, default=False)
+    
 

@@ -4,6 +4,10 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from app.core.config import settings
+from fastapi.security import OAuth2PasswordBearer
+
+# Indique l’URL où l’on récupère le token (login)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 # Contexte de hachage pour bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
