@@ -1,13 +1,3 @@
 [flake8]
-# On autorise temporairement un peu plus de longueur
 max-line-length = 120
-
-# On ignore les erreurs de blank lines, trailing whitespace et imports non utilisés
-extend-ignore =
-    E302,  # expected 2 blank lines
-    E305,  # expected 2 blank lines after class or function
-    W291,  # trailing whitespace
-    W292,  # no newline at end of file
-    W293,  # blank line contains whitespace
-    W391,  # blank line at end of file
-    F401   # imported but unused
+extend-ignore = E302, E305, W291, W292, W293, W391, F401
