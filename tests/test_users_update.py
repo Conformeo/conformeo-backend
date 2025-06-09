@@ -3,23 +3,44 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
-from app.core.security import get_password_hash
+
+# 1. Crée un tenant pour associer le user (sinon tenant_id NOT NULL)
+from app.models.tenant import Tenant
 from app.models.user import User
-from app.schemas.user import UserUpdate
+from app.core.security import get_password_hash
+
+
+hashed = get_password_hash("mon_mdp")
 
 
 def create_user_and_token(client, db_session, email, password, is_admin=False):
-    # Créer directement le user en base
+
+    # 1. Cherche le tenant, ou crée-le si besoin
+    tenant = db_session.query(Tenant).filter_by(name="test-tenant").first()
+    if not tenant:
+        tenant = Tenant(name="test-tenant")
+        db_session.add(tenant)
+        db_session.commit()
+        db_session.refresh(tenant)
+
+    # 2. Crée le user lié au tenant
     hashed = get_password_hash(password)
-    user = User(email=email, hashed_password=hashed, is_active=True, is_admin=is_admin)
+    user = User(
+        email=email,
+        hashed_password=hashed,
+        is_active=True,
+        is_admin=is_admin,  # <==== Ici !
+        tenant_id=tenant.id,
+    )
     db_session.add(user)
     db_session.commit()
     db_session.refresh(user)
-    # Récupérer le token
-    response = client.post(
-        "/auth/login", data={"username": email, "password": password}
-    )
-    return user, response.json()["access_token"]
+
+    # 3. Auth (login) pour obtenir le token
+    resp = client.post("/auth/login", data={"username": email, "password": password})
+    token = resp.json()["access_token"]
+
+    return user, token
 
 
 def test_user_can_update_own_profile(client, db_session):

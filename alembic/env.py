@@ -8,18 +8,20 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
 
+# 2) Maintenant on peut importer le fichier de configuration Pydantic
+from app.core.config import settings
+
+
+# 3) Importer la Base et les modèles pour que Alembic les connaisse
+from app.db.session import Base
+from app.models.user import User  # à adapter si tu as d'autres modèles
+
 # 1) On ajoute le dossier racine du projet (contenant "app/") au PYTHONPATH
 #    pour que Python puisse importer "app.core.config" et "app.db.session", etc.
 #    Ici, cwd() est ".../backend", donc join avec ".." remonte à la racine du projet.
 project_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
 sys.path.insert(0, project_root)
 
-# 2) Maintenant on peut importer le fichier de configuration Pydantic
-from app.core.config import settings
-
-# 3) Importer la Base et les modèles pour que Alembic les connaisse
-from app.db.session import Base
-from app.models.user import User  # à adapter si tu as d'autres modèles
 
 # --- Suite de la configuration Alembic ---
 config = context.config

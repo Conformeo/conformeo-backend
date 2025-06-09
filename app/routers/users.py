@@ -1,15 +1,22 @@
-# backend/app/routers/users.py
-
 from fastapi import APIRouter, Depends, HTTPException, status, Path, Response, Body
 from sqlalchemy.orm import Session
 
 from app.schemas.user import UserRead, UserUpdate
-from app.dependencies.auth import get_current_active_user
+from app.dependencies.auth import get_current_active_user, get_current_active_admin
 from app.db.session import get_db
-from app.services.user_service import get_user_by_id, update_user, delete_user
+from app.services.user_service import get_user_by_id, update_user
 from app.models.user import User as UserModel
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+
+@router.get("/", response_model=list[UserRead])
+def list_users(
+    db: Session = Depends(get_db),
+    admin: UserModel = Depends(get_current_active_admin),
+):
+    # Ne liste QUE les utilisateurs du même tenant
+    return db.query(UserModel).filter(UserModel.tenant_id == admin.tenant_id).all()
 
 
 @router.get("/me", response_model=UserRead)
@@ -20,12 +27,7 @@ def read_users_me(current_user: UserModel = Depends(get_current_active_user)):
     return current_user
 
 
-@router.get(
-    "/{user_id}",
-    response_model=UserRead,
-    status_code=status.HTTP_200_OK,
-    summary="Lire le profil d'un utilisateur par son ID",
-)
+@router.get("/{user_id}", response_model=UserRead, status_code=status.HTTP_200_OK)
 def read_user_by_id(
     user_id: int = Path(..., ge=1),
     current_user: UserModel = Depends(get_current_active_user),
@@ -49,12 +51,7 @@ def read_user_by_id(
     return target
 
 
-@router.put(
-    "/{user_id}",
-    response_model=UserRead,
-    status_code=status.HTTP_200_OK,
-    summary="Mettre à jour un profil utilisateur",
-)
+@router.put("/{user_id}", response_model=UserRead, status_code=status.HTTP_200_OK)
 def modify_user(
     user_id: int = Path(..., ge=1),
     user_in: UserUpdate = Body(),
@@ -71,7 +68,6 @@ def modify_user(
             status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur non trouvé"
         )
 
-    # Vérifier les droits
     if target.id != current_user.id and not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Pas autorisé"
@@ -88,30 +84,24 @@ def modify_user(
 )
 def remove_user(
     user_id: int = Path(..., ge=1),
-    current_user: UserModel = Depends(get_current_active_user),
     db: Session = Depends(get_db),
+    admin: UserModel = Depends(get_current_active_admin),
 ):
     """
-    - Seul un admin (`current_user.is_admin == True`) peut supprimer un compte.
-    - Renvoie 204 No Content si l’opération réussit.
+    - Seul un admin peut supprimer un compte utilisateur de son tenant.
+    - Ne peut PAS se supprimer lui-même (sécurité)
     """
-    if not current_user.is_admin:
+    user = (
+        db.query(UserModel)
+        .filter(UserModel.id == user_id, UserModel.tenant_id == admin.tenant_id)
+        .first()
+    )
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    if user.id == admin.id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Pas autorisé"
+            status_code=400, detail="Impossible de supprimer son propre compte"
         )
-
-    target = db.query(UserModel).filter(UserModel.id == user_id).first()
-    if not target:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur non trouvé"
-        )
-
-    # On ne peut pas supprimer soi-même, éventuellement
-    if target.id == current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Impossible de supprimer son propre compte",
-        )
-
-    delete_user(db, target)
+    db.delete(user)
+    db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

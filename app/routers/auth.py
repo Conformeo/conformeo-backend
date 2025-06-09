@@ -7,37 +7,39 @@ from sqlalchemy.orm import Session
 from app.core.security import verify_password, create_access_token, get_password_hash
 from app.db.session import get_db
 from app.models.user import User
+from app.models.tenant import Tenant
+
 from app.schemas.user import UserCreate, UserRead
 from app.core.config import Settings
 
+
 settings = Settings()
 
-router = APIRouter(tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    """
-    Inscription d'un nouvel utilisateur.
-    - Vérifie si l'email existe déjà.
-    - Hash le mot de passe, crée l'utilisateur en base.
-    - Retourne l'objet UserRead.
-    """
-    # 1) Vérifier si l'email est déjà utilisé
-    existing = db.query(User).filter(User.email == user_in.email).first()
-    if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Email déjà utilisé"
-        )
+    # Vérifier l'existence d'un tenant "default"
+    tenant = db.query(Tenant).filter_by(name="default").first()
+    if not tenant:
+        tenant = Tenant(name="default")
+        db.add(tenant)
+        db.commit()
+        db.refresh(tenant)
 
-    # 2) Créer l'utilisateur
-    hashed_pwd = get_password_hash(user_in.password)
-    db_user = User(email=user_in.email, hashed_password=hashed_pwd)
-    db.add(db_user)
+    hashed_pw = get_password_hash(user_in.password)
+    user = User(
+        email=user_in.email,
+        hashed_password=hashed_pw,
+        is_active=True,
+        is_admin=False,
+        tenant_id=tenant.id,
+    )
+    db.add(user)
     db.commit()
-    db.refresh(db_user)
-
-    return db_user
+    db.refresh(user)
+    return user  # ou le schéma UserRead
 
 
 @router.post("/login")

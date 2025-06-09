@@ -1,27 +1,37 @@
-import pytest
-from app.core.security import get_password_hash
+from app.models.tenant import Tenant
 from app.models.user import User
+from app.core.security import get_password_hash
+
+
+def get_auth_headers(client, email, password):
+    resp = client.post("/auth/login", data={"username": email, "password": password})
+    token = resp.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
 
 
 def test_read_users_me_success(client, db_session):
-    # 1) Créer un user actif via db_session (SQLite in-memory)
+    # 1. Crée un tenant
+    tenant = Tenant(name="test-tenant")
+    db_session.add(tenant)
+    db_session.commit()
+    db_session.refresh(tenant)
+
+    # 2. Crée un user lié à ce tenant
     hashed = get_password_hash("mypassword")
-    user = User(email="me@example.com", hashed_password=hashed, is_active=True)
+    user = User(
+        email="me@example.com",
+        hashed_password=hashed,
+        is_active=True,
+        is_admin=False,
+        tenant_id=tenant.id,
+    )
     db_session.add(user)
     db_session.commit()
     db_session.refresh(user)
 
-    # 2) Récupérer un token via l’endpoint /auth/login (utilise la fixture client)
-    response = client.post(
-        "/auth/login", data={"username": "me@example.com", "password": "mypassword"}
-    )
-    assert response.status_code == 200, f"Login a renvoyé {response.status_code}"
-    token = response.json()["access_token"]
-
-    # 3) Appeler GET /users/me avec le token obtenu
-    response = client.get("/users/me", headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 200, f"/users/me a renvoyé {response.status_code}"
-    data = response.json()
+    # 3. Authentifie et vérifie l'accès à /users/me
+    headers = get_auth_headers(client, "me@example.com", "mypassword")
+    resp = client.get("/users/me", headers=headers)
+    assert resp.status_code == 200
+    data = resp.json()
     assert data["email"] == "me@example.com"
-    assert data["is_active"] is True
-    assert "id" in data

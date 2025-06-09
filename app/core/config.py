@@ -15,3 +15,6 @@ class Settings(BaseSettings):
     def __init__(self, **kwargs):
         load_dotenv(find_dotenv(), override=True)
         super().__init__(**kwargs)
+
+
+settings = Settings()  # <== L’instance !

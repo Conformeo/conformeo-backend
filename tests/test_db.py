@@ -17,3 +17,10 @@ def test_users_table_exists(connection):
     inspector = inspect(connection)
     tables = inspector.get_table_names()
     assert "users" in tables
+
+
+def test_tenants_and_users_tables_exist(connection):
+    inspector = inspect(connection)
+    tables = inspector.get_table_names()
+    assert "tenants" in tables
+    assert "users" in tables

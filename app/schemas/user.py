@@ -19,13 +19,14 @@ class UserCreate(BaseModel):
 class UserRead(BaseModel):
     """
     Schéma pour renvoyer un utilisateur en réponse :
-    - id, email, is_active, date_created
+    - id, email, is_active, created_at
     """
 
     id: int
     email: EmailStr
+    is_admin: bool  # <--- Ajoute ici aussi
     is_active: bool
-    date_created: datetime
+    created_at: datetime
 
     class Config:
         orm_mode = True

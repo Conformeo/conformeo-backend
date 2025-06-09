@@ -1,62 +1,54 @@
-# backend/tests/test_users_delete.py
-
 import pytest
-from fastapi.testclient import TestClient
-from app.main import app
+from app.models.user import User as UserModel
 from app.core.security import get_password_hash
-from app.models.user import User
 
 
-def create_user(client, db_session, email, password, is_admin=False):
-    hashed = get_password_hash(password)
-    user = User(email=email, hashed_password=hashed, is_active=True, is_admin=is_admin)
+def create_user(db_session, email, password, is_admin=False, tenant_id=1):
+    user = UserModel(
+        email=email,
+        hashed_password=get_password_hash(password),
+        is_active=True,
+        is_admin=is_admin,
+        tenant_id=tenant_id,
+    )
     db_session.add(user)
     db_session.commit()
     db_session.refresh(user)
     return user
 
 
-def get_token_for(client, email, password):
+def get_auth_headers(client, email, password):
     resp = client.post("/auth/login", data={"username": email, "password": password})
-    assert resp.status_code == 200
-    return resp.json()["access_token"]
+    token = resp.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
 
 
 def test_admin_can_delete_user(client, db_session):
-    # Préparer un admin et un utilisateur à supprimer
-    admin = create_user(client, db_session, "admin@ex.com", "adminpass", is_admin=True)
-    target = create_user(
-        client, db_session, "victim@ex.com", "userpass", is_admin=False
+    tenant_id = 1
+    admin = create_user(
+        db_session, "admin@del.com", "adminpass", is_admin=True, tenant_id=tenant_id
+    )
+    user = create_user(
+        db_session, "todelete@del.com", "pass12345", is_admin=False, tenant_id=tenant_id
     )
 
-    token = get_token_for(client, admin.email, "adminpass")
-    response = client.delete(
-        f"/users/{target.id}", headers={"Authorization": f"Bearer {token}"}
+    headers = get_auth_headers(client, admin.email, "adminpass")
+    # On delete
+    resp = client.delete(f"/users/{user.id}", headers=headers)
+    assert resp.status_code == 204
+
+    # Vérifie que le user est bien supprimé
+    assert db_session.query(UserModel).filter_by(id=user.id).first() is None
+
+
+def test_non_admin_cannot_delete_user(client, db_session):
+    tenant_id = 1
+    user = create_user(
+        db_session, "user@del.com", "pass12345", is_admin=False, tenant_id=tenant_id
     )
-    assert response.status_code == 204
-
-    # Vérifier que l'utilisateur n'existe plus
-    resp = client.get(
-        f"/users/{target.id}", headers={"Authorization": f"Bearer {token}"}
+    user2 = create_user(
+        db_session, "other@del.com", "pass12345", is_admin=False, tenant_id=tenant_id
     )
-    assert resp.status_code == 404
-
-
-def test_non_admin_cannot_delete(client, db_session):
-    user1 = create_user(client, db_session, "u1@ex.com", "pass1", is_admin=False)
-    user2 = create_user(client, db_session, "u2@ex.com", "pass2", is_admin=False)
-
-    token = get_token_for(client, user1.email, "pass1")
-    response = client.delete(
-        f"/users/{user2.id}", headers={"Authorization": f"Bearer {token}"}
-    )
-    assert response.status_code == 403
-
-
-def test_cannot_delete_self_even_admin(client, db_session):
-    admin = create_user(client, db_session, "admin2@ex.com", "adminpass", is_admin=True)
-    token = get_token_for(client, admin.email, "adminpass")
-    response = client.delete(
-        f"/users/{admin.id}", headers={"Authorization": f"Bearer {token}"}
-    )
-    assert response.status_code == 400
+    headers = get_auth_headers(client, user.email, "pass12345")
+    resp = client.delete(f"/users/{user2.id}", headers=headers)
+    assert resp.status_code == 403

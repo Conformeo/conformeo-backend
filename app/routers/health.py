@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-router = APIRouter()
+router = APIRouter(prefix="/health", tags=["health"])
 
 
 @router.get("/", summary="Statut de santé de l'API")
