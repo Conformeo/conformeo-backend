@@ -9,5 +9,9 @@ class Tenant(Base):
     name = Column(String, unique=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    # 🔥 Ajoute cette ligne :
+    # user relation
     users = relationship("User", back_populates="tenant")
+    # checklist relation
+    checklists = relationship(
+        "Checklist", back_populates="tenant", cascade="all, delete-orphan"
+    )

@@ -16,6 +16,7 @@ from app.core.config import settings
 from app.db.session import Base
 from app.models.user import User  # à adapter si tu as d'autres modèles
 
+
 # 1) On ajoute le dossier racine du projet (contenant "app/") au PYTHONPATH
 #    pour que Python puisse importer "app.core.config" et "app.db.session", etc.
 #    Ici, cwd() est ".../backend", donc join avec ".." remonte à la racine du projet.

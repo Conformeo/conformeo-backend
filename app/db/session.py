@@ -1,9 +1,13 @@
 # backend/app/db/session.py
 
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+
+# from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from app.core.config import Settings
+from sqlalchemy.orm import declarative_base
+
+# Base = declarative_base()
 
 settings = Settings()
 
