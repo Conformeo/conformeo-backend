@@ -1,9 +1,7 @@
-from app.db.session import Base  # <- c'est là que tu déclares Base = declarative_base()
-from app.models.user import User
+from app.db.session import Base
 from app.models.tenant import Tenant
+from app.models.user import User
 from app.models.checklist import Checklist
+from app.models.checklist_item import ChecklistItem  # ← OK maintenant
 
-
-# Base = declarative_base()
-
-# Forcer l'import des modèles ici (sinon Alembic ne les voit PAS !)
+# __all__ = ["Base", "Tenant", "User", "Checklist", "ChecklistItem"]

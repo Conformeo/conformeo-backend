@@ -8,6 +8,7 @@ from app.routers.auth import router as auth_router
 from app.routers.users import router as users_router
 from app.routers.tenants import router as tenants_router
 from app.routers.checklists import router as checklist_router
+from app.routers.checklist_items import router as items_router
 
 
 from app.core.config import Settings
@@ -39,3 +40,4 @@ app.include_router(auth_router)
 app.include_router(tenants_router)
 app.include_router(users_router)
 app.include_router(checklist_router)
+app.include_router(items_router)
