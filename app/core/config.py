@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic.networks import AnyUrl
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     def __init__(self, **kwargs):
         load_dotenv(find_dotenv(), override=True)
         super().__init__(**kwargs)
+
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
 settings = Settings()  # <== L’instance !

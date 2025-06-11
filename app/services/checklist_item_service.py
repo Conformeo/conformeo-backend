@@ -10,7 +10,7 @@ def get_items_by_checklist(db: Session, checklist_id: int):
 
 
 def create_item(db: Session, checklist_id: int, data: ChecklistItemCreate):
-    item = ChecklistItem(checklist_id=checklist_id, **data.dict())
+    item = ChecklistItem(checklist_id=checklist_id, **data.model_dump())
     db.add(item)
     db.commit()
     db.refresh(item)
@@ -18,7 +18,7 @@ def create_item(db: Session, checklist_id: int, data: ChecklistItemCreate):
 
 
 def update_item(db: Session, item: ChecklistItem, data: ChecklistItemUpdate):
-    for key, value in data.dict(exclude_unset=True).items():
+    for key, value in data.model_dump(exclude_unset=True).items():
         setattr(item, key, value)
     db.commit()
     db.refresh(item)

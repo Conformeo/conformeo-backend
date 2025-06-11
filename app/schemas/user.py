@@ -1,7 +1,7 @@
 # backend/app/schemas/user.py
 
 from typing import Annotated
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, ConfigDict, Field
 from datetime import datetime
 
 
@@ -17,19 +17,13 @@ class UserCreate(BaseModel):
 
 
 class UserRead(BaseModel):
-    """
-    Schéma pour renvoyer un utilisateur en réponse :
-    - id, email, is_active, created_at
-    """
-
     id: int
     email: EmailStr
-    is_admin: bool  # <--- Ajoute ici aussi
     is_active: bool
     created_at: datetime
 
-    class Config:
-        orm_mode = True
+    # avant : class Config: orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserUpdate(BaseModel):
@@ -42,8 +36,4 @@ class UserUpdate(BaseModel):
     email: Annotated[EmailStr, Field(default=None)]
     password: Annotated[str, Field(default=None, min_length=8)]
 
-    class Config:
-        orm_mode = True
-        extra = (
-            "forbid"  # Interdit les champs supplémentaires non définis dans le schéma
-        )
+    model_config = ConfigDict(from_attributes=True)

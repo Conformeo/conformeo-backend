@@ -13,7 +13,7 @@ router = APIRouter(prefix="/checklists", tags=["checklists"])
 
 @router.post("/", response_model=ChecklistRead, status_code=status.HTTP_201_CREATED)
 def create_checklist(checklist_in: ChecklistCreate, db: Session = Depends(get_db)):
-    checklist = Checklist(**checklist_in.dict())
+    checklist = Checklist(**checklist_in.model_dump())
     db.add(checklist)
     db.commit()
     db.refresh(checklist)
@@ -44,7 +44,7 @@ def update_checklist(
     checklist = db.query(Checklist).filter(Checklist.id == checklist_id).first()
     if not checklist:
         raise HTTPException(status_code=404, detail="Checklist not found")
-    for attr, value in checklist_in.dict(exclude_unset=True).items():
+    for attr, value in checklist_in.model_dump(exclude_unset=True).items():
         setattr(checklist, attr, value)
     db.commit()
     db.refresh(checklist)

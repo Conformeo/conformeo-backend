@@ -1,6 +1,6 @@
 # backend/app/core/security.py
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
@@ -28,9 +28,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     Le token expirera selon `expires_delta` ou selon ACCESS_TOKEN_EXPIRE_MINUTES.
     """
     to_encode = data.copy()
-    expire = datetime.utcnow() + (
-        expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
+    expire = datetime.now(UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM

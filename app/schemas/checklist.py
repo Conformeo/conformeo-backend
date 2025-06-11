@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime  # si tu as created_at
 
@@ -21,5 +21,4 @@ class ChecklistRead(ChecklistBase):
     tenant_id: int
     created_at: datetime  # si tu l’as ajouté
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

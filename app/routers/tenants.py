@@ -9,7 +9,7 @@ router = APIRouter(prefix="/tenants", tags=["tenants"])
 
 @router.post("/", response_model=Tenant)
 def create_tenant(tenant_in: TenantCreate, db: Session = Depends(get_db)):
-    tenant = TenantModel(**tenant_in.dict())
+    tenant = TenantModel(**tenant_in.model_dump())
     db.add(tenant)
     db.commit()
     db.refresh(tenant)
@@ -36,7 +36,7 @@ def update_tenant(
     tenant = db.query(TenantModel).filter(TenantModel.id == tenant_id).first()
     if not tenant:
         raise HTTPException(status_code=404, detail="Tenant not found")
-    for key, value in tenant_in.dict().items():
+    for key, value in tenant_in.model_dump().items():
         setattr(tenant, key, value)
     db.commit()
     db.refresh(tenant)
