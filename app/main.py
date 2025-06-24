@@ -9,9 +9,13 @@ from app.routers.users import router as users_router
 from app.routers.tenants import router as tenants_router
 from app.routers.checklists import router as checklist_router
 from app.routers.checklist_items import router as items_router
-
-
+from app.routers.extinguishers import router as extinguishers
+from app.routers.camera import router as camera_router
+from app.routers.kits import router as kits_router
+from app.routers.certification import router as certification_router
+from app.routers.insurance import router as insurance_router
 from app.core.config import Settings
+
 
 settings = Settings()
 
@@ -41,3 +45,8 @@ app.include_router(tenants_router)
 app.include_router(users_router)
 app.include_router(checklist_router)
 app.include_router(items_router)
+app.include_router(extinguishers)
+app.include_router(camera_router)
+app.include_router(kits_router)
+app.include_router(certification_router)
+app.include_router(insurance_router)
