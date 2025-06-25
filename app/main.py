@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.routers.health import router as health_router
 from app.routers.auth import router as auth_router
@@ -15,13 +16,18 @@ from app.routers.kits import router as kits_router
 from app.routers.certification import router as certification_router
 from app.routers.insurance import router as insurance_router
 from app.core.config import Settings
+from fastapi.staticfiles import StaticFiles
+
 
 
 settings = Settings()
 
 app = FastAPI(
-    title="Mon App MVP", description="API FastAPI - Sprint 1…", version="0.1.0"
+    title="Conformeo", description="API FastAPI - Sprint 1…", version="0.1.0"
 )
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.mount("/static", StaticFiles(directory="app/uploads", html=True), name="static")
+
 
 origins = ["http://localhost", "http://localhost:4200"]
 app.add_middleware(
