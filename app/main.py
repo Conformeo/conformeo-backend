@@ -15,8 +15,11 @@ from app.routers.camera import router as camera_router
 from app.routers.kits import router as kits_router
 from app.routers.certification import router as certification_router
 from app.routers.insurance import router as insurance_router
+from app.routers import documents
 from app.core.config import Settings
 from fastapi.staticfiles import StaticFiles
+
+
 
 
 
@@ -26,6 +29,7 @@ app = FastAPI(
     title="Conformeo", description="API FastAPI - Sprint 1…", version="0.1.0"
 )
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.mount("/static", StaticFiles(directory="app/uploads", html=True), name="static")
 app.mount("/static", StaticFiles(directory="app/uploads", html=True), name="static")
 
 
@@ -56,3 +60,4 @@ app.include_router(camera_router)
 app.include_router(kits_router)
 app.include_router(certification_router)
 app.include_router(insurance_router)
+app.include_router(documents.router)
