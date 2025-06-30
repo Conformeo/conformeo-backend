@@ -1,6 +1,6 @@
 # backend/app/main.py
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response  # <--- AJOUT ICI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -18,20 +18,23 @@ from app.routers.insurance import router as insurance_router
 from app.routers import documents
 from app.core.config import Settings
 from fastapi.staticfiles import StaticFiles
-
-
-
-
+from app.routers.sites import router as sites_router 
 
 settings = Settings()
 
 app = FastAPI(
     title="Conformeo", description="API FastAPI - Sprint 1…", version="0.1.0"
 )
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/static", StaticFiles(directory="app/uploads", html=True), name="static")
-app.mount("/static", StaticFiles(directory="app/uploads", html=True), name="static")
+# app.mount("/uploads", StaticFiles(directory="app/uploads"), name="uploads")
 
+# Middleware d'upload max size (juste ici)
+@app.middleware("http")
+async def limit_upload_size(request: Request, call_next):
+    max_body_size = 10 * 1024 * 1024  # Limite à 10 Mo
+    if request.headers.get("content-length") and int(request.headers["content-length"]) > max_body_size:
+        return Response("Fichier trop gros", status_code=413)
+    return await call_next(request)
 
 origins = ["http://localhost", "http://localhost:4200"]
 app.add_middleware(
@@ -61,3 +64,4 @@ app.include_router(kits_router)
 app.include_router(certification_router)
 app.include_router(insurance_router)
 app.include_router(documents.router)
+app.include_router(sites_router, prefix="/api")
