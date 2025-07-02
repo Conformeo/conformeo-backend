@@ -1,55 +1,43 @@
 # backend/conftest.py
-
 import os
 import pytest
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
-# Importer les objets du projet
-from app.db.session import Base, get_db, engine
-from app.models.user import User
-from app.main import app  # L'instance FastAPI
+# Project imports
+from app.db.base_class import Base
+from app.db.session import get_db, engine, engine_test, SessionLocalTest
+from app.main import app as fastapi_app
+from app.models.tenant import Tenant
+# Import models to register their tables in Base.metadata
+from app.models.gdpr_action import GdprAction
+from app.models.processing_action import processing_actions
 
-
+# ──────────────────────────────────────────────
+#  PostgreSQL base – created once per test run
+# ──────────────────────────────────────────────
 @pytest.fixture(scope="session", autouse=True)
 def prepare_database():
-    # Crée toutes les tables avant les tests
+    """Create / drop all PostgreSQL tables for the integration test session."""
     Base.metadata.create_all(bind=engine)
     yield
-    # (Optionnel : drop les tables à la fin)
     Base.metadata.drop_all(bind=engine)
 
 
-# 1) On crée un engine "in-memory" pour SQLite
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
-
-# echo=False pour ne pas spammer la console pendant les tests
-engine_test = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}, echo=False
-)
-
-# SessionLocalTest :
-SessionLocalTest = sessionmaker(autocommit=False, autoflush=False, bind=engine_test)
-
-
-# 2) Fixture qui crée la table "users" en mémoire AVANT chaque test de module
-#    et détruit la table APRES
+# ──────────────────────────────────────────────
+#  In‑memory SQLite – fast unit tests layer
+# ──────────────────────────────────────────────
 @pytest.fixture(scope="module")
 def setup_test_db():
-    # Crée toutes les tables (User + futures tables) dans la DB SQLite en mémoire
+    """Create the whole schema in the ephemeral SQLite DB then clean it up."""
     Base.metadata.create_all(bind=engine_test)
-    yield  # Après le yield, le teardown pourra se faire
-    Base.metadata.drop_all(bind=engine_test)  # Nettoyage
+    yield
+    Base.metadata.drop_all(bind=engine_test)
 
 
-# 3) Fixture pour obtenir une session SQLAlchemy "test"
 @pytest.fixture(scope="function")
 def db_session(setup_test_db):
-    """
-    Cette fixture fournit une session liée à SQLite in-memory,
-    et rollback automatiquement à la fin de chaque function-test.
-    """
+    """Provide a SQLite session bound to a SAVEPOINT and roll it back afterwards."""
     connection = engine_test.connect()
     transaction = connection.begin()
     session = SessionLocalTest(bind=connection)
@@ -61,27 +49,40 @@ def db_session(setup_test_db):
     connection.close()
 
 
-# 4) Override de la dépendance get_db pour qu’elle utilise sqlite-test au lieu de PostgreSQL
 @pytest.fixture(scope="function")
 def client(db_session):
-    """
-    Cette fixture démarre un TestClient FastAPI dont la dépendance get_db()
-    renverra toujours une session SQLite in-memory (via db_session).
-    """
+    """Return a FastAPI TestClient wired to the in‑memory SQLite session."""
 
-    # Fonction qui remplace get_db()
     def override_get_db():
         try:
             yield db_session
         finally:
-            pass  # Pas besoin de fermer ici car db_session fixture s'en charge
+            pass
 
-    # Remplacement dans FastAPI
-    app.dependency_overrides[get_db] = override_get_db
+    fastapi_app.dependency_overrides[get_db] = override_get_db
 
-    # On crée un client TestClient pour appeler l’API
-    client = TestClient(app)
-    yield client
+    with TestClient(fastapi_app) as c:
+        yield c
 
-    # Après tous les tests, on peut enlever l’override si besoin
-    app.dependency_overrides.clear()
+    fastapi_app.dependency_overrides.clear()
+
+
+# ──────────────────────────────────────────────
+#  Helper – auth headers (public routes for now)
+# ──────────────────────────────────────────────
+@pytest.fixture
+def auth_headers():
+    return {}
+
+
+# ──────────────────────────────────────────────
+#  Tenant factory for tests
+# ──────────────────────────────────────────────
+@pytest.fixture(scope="function")
+def tenant(db_session):
+    """Create a dummy Tenant in the test database and return it."""
+    t = Tenant(name="Tenant-test")
+    db_session.add(t)
+    db_session.commit()
+    db_session.refresh(t)
+    return t

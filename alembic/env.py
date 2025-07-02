@@ -15,7 +15,12 @@ from app.core.config import settings
 # 3) Importer la Base et les modèles pour que Alembic les connaisse
 from app.db.session import Base
 from app.models.user import User  # à adapter si tu as d'autres modèles
+from app.db.base import Base  # target_metadata = Base.metadata
 
+from app.db.base_class import Base           # ← metadata cible
+
+# Import side-effects pour enregistrer les modèles …
+import app.models  # noqa: F401  (processing, gdpr_action, link, etc.)
 
 # 1) On ajoute le dossier racine du projet (contenant "app/") au PYTHONPATH
 #    pour que Python puisse importer "app.core.config" et "app.db.session", etc.

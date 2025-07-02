@@ -6,9 +6,10 @@ class Site(BaseModel):
     id: str
     name: str
     address: str
-    zipCode: str
     city: str
-    score: Optional[int] = None
+    zipCode: str
+    score: Optional[int] = None          # ou float si besoin
+
 
 class SitePhoto(BaseModel):
     filename: str

@@ -7,7 +7,7 @@ from app.db.session import get_db
 router = APIRouter(prefix="/tenants", tags=["tenants"])
 
 
-@router.post("/", response_model=Tenant)
+@router.post("/", response_model=Tenant, status_code=200)  # ⬅️ 200 attendu par le test
 def create_tenant(tenant_in: TenantCreate, db: Session = Depends(get_db)):
     tenant = TenantModel(**tenant_in.model_dump())
     db.add(tenant)

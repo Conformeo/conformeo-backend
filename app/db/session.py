@@ -1,34 +1,57 @@
 # backend/app/db/session.py
+"""Session & engines
+- `engine`         : connexion PostgreSQL (prod/dev)
+- `engine_test`    : SQLite in-memory (tests unitaires, pool StaticPool)
+- `get_db`         : dépendance FastAPI → SessionLocal (PostgreSQL)
+- `SessionLocalTest`: session factory pour SQLite
+"""
+from __future__ import annotations
 
 from sqlalchemy import create_engine
-
-# from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from app.core.config import Settings
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.pool import StaticPool                 # ← NEW
 
-# Base = declarative_base()
+from app.core.config import Settings
+from app.db.base_class import Base                     # Base unique
 
 settings = Settings()
 
-# Création de l'engine : il se connecte à PostgreSQL via la variable d'environnement DATABASE_URL
+# ──────────────────────────────
+#  PostgreSQL – env. dev / prod
+# ──────────────────────────────
 engine = create_engine(
-    str(settings.DATABASE_URL),
-    echo=True,  # Affiche les requêtes SQL générées (utile en dev)
-    future=True,  # Active le style "2.0" si tu utilises SQLAlchemy >=1.4
+    str(settings.DATABASE_URL),   # AnyUrl → str
+    future=True,
+    pool_pre_ping=True,
 )
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# SessionLocal sera utilisée pour obtenir un objet Session par requête
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, future=True)
+# ──────────────────────────────
+#  SQLite in-memory – tests
+#   (une seule connexion partagée)
+# ──────────────────────────────
+engine_test = create_engine(
+    "sqlite://",                                  # URI vide ⇒ in-memory
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,                         # ← connexion unique
+    future=True,
+)
+SessionLocalTest = sessionmaker(autocommit=False, autoflush=False, bind=engine_test)
 
-# Base est la classe mère pour tous les modèles déclaratifs
-Base = declarative_base()
-
-
-# Dépendance FastAPI : on pourra l’importer dans les routers pour obtenir une session
+# ──────────────────────────────
+#  Dépendance FastAPI
+# ──────────────────────────────
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+__all__ = [
+    "engine",
+    "SessionLocal",
+    "engine_test",
+    "SessionLocalTest",
+    "get_db",
+]
