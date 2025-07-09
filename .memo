@@ -2,3 +2,6 @@
 pytest --maxfail=1 --disable-warnings -q
 python -m uvicorn app.main:app --reload
 docker-compose up -d postgres
+
+
+psql -U postgres -d conformeo

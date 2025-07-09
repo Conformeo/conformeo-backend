@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 from app.models.m2m import processing_actions 
+
 # ──────────────────────────────────────────────────────────
 #  Enum RGPD – valeurs FR stockées en base
 # ──────────────────────────────────────────────────────────

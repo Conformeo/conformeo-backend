@@ -9,7 +9,7 @@ class Checklist(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
-    tenant_id = Column(Integer, ForeignKey("tenants.id"), nullable=False)
+    tenant_id = Column(Integer, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
     # Optionnel, relation avec Tenant
     tenant = relationship("Tenant", back_populates="checklists")
     # horodatage auto, harmonisé avec les autres tables

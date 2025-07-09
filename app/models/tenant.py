@@ -33,4 +33,7 @@ class Tenant(Base):
         cascade="all, delete-orphan",
     )
 
+    securite_controles = relationship("SecuriteControle", back_populates="societe", lazy="dynamic")
+
+
 

@@ -1,6 +1,3 @@
-# ────────────────────────────────────────────
-# backend/app/main.py
-# ────────────────────────────────────────────
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -15,14 +12,23 @@ from app.routers.checklist_items import router as items_router
 from app.routers.extinguishers import router as extinguishers_router
 from app.routers.camera import router as camera_router
 from app.routers.kits import router as kits_router
-from app.routers.certification import router as certification_router
+# from app.routers.certification import router as certification_router
+from app.routers.certif import router as certif_router
 from app.routers.insurance import router as insurance_router
 from app.routers.sites import router as sites_router
 from app.routers.workers import router as workers_router
-from app.routers.rgpd_processings import router as rgpd_router
-from app.routers.rgpd_actions import router as actions_router
-from app.routers import documents
+from app.routers.duerp import router as duerp_router
+from app.routers.securite import router as securite_router
 
+
+# RGPD Routers – NOUVEAU (utilise tes nouveaux fichiers)
+from app.routers.rgpd import router as rgpd_router      # ← Ton endpoint principal RGPD (audit, exigences, réponses, etc.)
+# (si besoin, adapte ici selon le nom de ton router principal)
+# from app.routers.rgpd_exigences import router as rgpd_exigences_router
+# from app.routers.rgpd_audit import router as rgpd_audit_router
+# from app.routers.rgpd_audit_exigence import router as rgpd_audit_exigence_router
+
+from app.routers import documents
 from app.core.config import Settings
 
 # ─── App & Config ───────────────────────────────────────────────────────────────
@@ -66,11 +72,14 @@ _API_ROUTERS = [
     documents.router,
     sites_router,
     workers_router,
-    rgpd_router,
+    rgpd_router,                 # Nouveau router RGPD principal !
+    duerp_router,
     items_router,
+    securite_router,
     checklist_router,
     extinguishers_router,
-    certification_router,
+    # certification_router,
+    certif_router,
     insurance_router,
     camera_router,
     kits_router,
@@ -81,8 +90,7 @@ _API_ROUTERS.extend([auth_router, users_router, tenants_router])
 for rtr in _API_ROUTERS:
     app.include_router(rtr, prefix=API_PREFIX)
 
-app.include_router(actions_router, prefix=f"{API_PREFIX}/rgpd")
-
+# Routes racine (hors préfixe /api, pour certains cas)
 _ROOT_ROUTERS = [
     health_router,
     auth_router,
@@ -91,7 +99,8 @@ _ROOT_ROUTERS = [
     checklist_router,
     items_router,
     extinguishers_router,
-    certification_router,
+    certif_router,
+    # certification_router,
     camera_router,
     kits_router,
     insurance_router,
@@ -100,16 +109,15 @@ _ROOT_ROUTERS = [
 for rtr in _ROOT_ROUTERS:
     app.include_router(rtr)
 
-app.include_router(actions_router, prefix="/rgpd")
-
-@app.on_event("startup")
-async def _debug_routes() -> None:
-    print("\n─── Routes déclarées ───")
-    for r in app.router.routes:
-        if hasattr(r, "methods"):
-            methods = ",".join(r.methods or [])
-            path = getattr(r, "path", getattr(r, "path_format", ""))
-            print(f"{path:40s}  [{methods}]")
-        else:
-            print(f"{getattr(r, 'path', r.name):40s}  [MOUNT]")
-    print("────────────────────────\n")
+# --------  Debugging routes
+# @app.on_event("startup")
+# async def _debug_routes() -> None:
+#     print("\n─── Routes déclarées ───")
+#     for r in app.router.routes:
+#         if hasattr(r, "methods"):
+#             methods = ",".join(r.methods or [])
+#             path = getattr(r, "path", getattr(r, "path_format", ""))
+#             print(f"{path:40s}  [{methods}]")
+#         else:
+#             print(f"{getattr(r, 'path', r.name):40s}  [MOUNT]")
+#     print("────────────────────────\n")

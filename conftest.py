@@ -34,6 +34,37 @@ def setup_test_db():
     yield
     Base.metadata.drop_all(bind=engine_test)
 
+# ──────────────────────────────────────────────
+#  Seed minimal pour la table gdpr_actions
+# ──────────────────────────────────────────────
+@pytest.fixture(scope="module", autouse=True)
+def seed_actions(setup_test_db):
+    """
+    Insère 10 actions RGPD dans la base SQLite in-memory
+    (exécuté une seule fois pour tout le module de tests).
+    """
+    from app.models.gdpr_action import GdprAction, ActionScope
+    from app.db.session import SessionLocalTest
+
+    session = SessionLocalTest()
+    # Ne rien faire si déjà peuplé (re-lance possible des tests)
+    if session.query(GdprAction).first():
+        session.close()
+        return
+
+    bulk = [
+        GdprAction(
+            label=f"Action {n}",
+            article=f"Art. {n}",
+            scope=ActionScope.ALL,
+        )
+        for n in range(1, 11)
+    ]
+    session.add_all(bulk)
+    session.commit()
+    session.close()
+
+
 
 @pytest.fixture(scope="function")
 def db_session(setup_test_db):
@@ -86,3 +117,4 @@ def tenant(db_session):
     db_session.commit()
     db_session.refresh(t)
     return t
+
