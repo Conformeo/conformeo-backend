@@ -18,3 +18,4 @@ class User(Base):
     certifs = relationship("Certif", back_populates="user")
     ouvriers = relationship("Ouvrier", back_populates="user")
     securite_controles = relationship("SecuriteControle", back_populates="user", lazy="dynamic")
+    registers = relationship("Register", back_populates="user")

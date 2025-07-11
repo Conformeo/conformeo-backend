@@ -12,6 +12,7 @@ from app.models.tenant import Tenant
 from app.schemas.user import UserCreate, UserRead
 from app.core.config import Settings
 
+from app.crud.crud_user import create as create_user_crud, get_by_email
 
 settings = Settings()
 
@@ -28,19 +29,13 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(tenant)
 
-    hashed_pw = get_password_hash(user_in.password)
-    user = User(
-        email=user_in.email,
-        hashed_password=hashed_pw,
-        is_active=True,
-        is_admin=False,
-        tenant_id=tenant.id,
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user  # ou le schéma UserRead
+    # Vérifier que l'email n'existe pas déjà
+    if get_by_email(db, user_in.email):
+        raise HTTPException(status_code=400, detail="Email déjà utilisé")
 
+    # Utiliser le CRUD user pour créer (le CRUD se charge du hash du mot de passe)
+    user = create_user_crud(db, user_in, tenant_id=tenant.id)
+    return user  # renvoie un modèle User (sera transformé en UserRead par FastAPI)
 
 @router.post("/login")
 def login(
@@ -52,8 +47,8 @@ def login(
     - Vérifie l'existence de l'utilisateur et le mot de passe.
     - Génère un JWT (access_token) si OK.
     """
-    # 1) Récupérer l'utilisateur par email
-    user = db.query(User).filter(User.email == form_data.username).first()
+    # 1) Récupérer l'utilisateur par email via le CRUD
+    user = get_by_email(db, form_data.username)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

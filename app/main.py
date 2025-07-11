@@ -19,6 +19,8 @@ from app.routers.sites import router as sites_router
 from app.routers.workers import router as workers_router
 from app.routers.duerp import router as duerp_router
 from app.routers.securite import router as securite_router
+from app.routers.obligation import router as obligation_router
+from app.routers.rgpd_export import router as rgpd_export_router
 
 
 # RGPD Routers – NOUVEAU (utilise tes nouveaux fichiers)
@@ -72,12 +74,14 @@ _API_ROUTERS = [
     documents.router,
     sites_router,
     workers_router,
-    rgpd_router,                 # Nouveau router RGPD principal !
+    rgpd_router,
+    rgpd_export_router,                 # Nouveau router RGPD principal !
     duerp_router,
     items_router,
     securite_router,
     checklist_router,
     extinguishers_router,
+    obligation_router,
     # certification_router,
     certif_router,
     insurance_router,
