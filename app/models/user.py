@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
-from app.db.session import Base
-
+from app.db.base_class import Base
+# from app.models.registre import Registre  # Tu peux garder ou commenter si tu as des imports circulaires
 
 class User(Base):
     __tablename__ = "users"
@@ -13,9 +13,10 @@ class User(Base):
     tenant_id = Column(Integer, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    # 🔥 Ajoute cette ligne :
+    # Relations
     tenant = relationship("Tenant", back_populates="users")
     certifs = relationship("Certif", back_populates="user")
     ouvriers = relationship("Ouvrier", back_populates="user")
     securite_controles = relationship("SecuriteControle", back_populates="user", lazy="dynamic")
-    registers = relationship("Register", back_populates="user")
+    registres = relationship("Registre", back_populates="user", cascade="all, delete-orphan")
+    audit_logs = relationship("AuditLog", back_populates="user", cascade="all, delete-orphan")

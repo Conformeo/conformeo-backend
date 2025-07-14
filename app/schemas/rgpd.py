@@ -1,3 +1,4 @@
+from pydantic import ConfigDict
 from pydantic import BaseModel
 from typing import Optional, List
 from pydantic import BaseModel
@@ -7,6 +8,7 @@ class GdprActionBase(BaseModel):
     label: str
     article: Optional[str] = None
     scope: ActionScope
+    model_config = ConfigDict(from_attributes=True)
 
 class GdprActionRead(GdprActionBase):
     id: int
@@ -18,6 +20,7 @@ class RgpdExigenceBase(BaseModel):
     article: Optional[str] = None
     critical: Optional[bool] = False
     advice: Optional[str] = None
+    model_config = ConfigDict(from_attributes=True)
 
 class RgpdExigenceRead(RgpdExigenceBase):
     id: int
@@ -29,6 +32,7 @@ class RgpdAuditExigenceBase(BaseModel):
     answer: str
     critical: Optional[bool] = False
     advice: Optional[str] = None
+    model_config = ConfigDict(from_attributes=True)
 
 class RgpdAuditExigenceRead(RgpdAuditExigenceBase):
     id: int
@@ -41,6 +45,7 @@ class RgpdAuditBase(BaseModel):
     user_id: int
     company_id: Optional[int]
     statut: Optional[str] = "EN_COURS"
+    model_config = ConfigDict(from_attributes=True)
 
 class RgpdAuditCreate(RgpdAuditBase):
     exigences: List[RgpdAuditExigenceBase]

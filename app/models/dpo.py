@@ -13,5 +13,3 @@ class Dpo(Base):
     designation_date = Column(Date, nullable=True)
     is_external = Column(Boolean, default=False)
 
-    registers = relationship("Register", back_populates="dpo")
-

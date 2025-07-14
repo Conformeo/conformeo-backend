@@ -1,3 +1,4 @@
+from pydantic import ConfigDict
 # app/schemas/site_document.py
 
 from pydantic import BaseModel
@@ -8,6 +9,7 @@ class SiteDocumentBase(BaseModel):
     file_url: str
     uploaded_at: datetime
     type: str
+    model_config = ConfigDict(from_attributes=True)
 
 class SiteDocumentCreate(SiteDocumentBase):
     site_id: str

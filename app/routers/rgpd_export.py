@@ -5,7 +5,7 @@ from app.db.session import get_db
 from app.models.user import User
 from app.models.dpo import Dpo
 from app.models.obligation import Obligation
-from app.models.register import Register
+from app.models.registre import Registre
 from io import BytesIO
 from fpdf import FPDF
 
@@ -17,7 +17,7 @@ def export_pdf(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     dpo = db.query(Dpo).filter(Dpo.user_id == user_id).first()
     obligations = db.query(Obligation).filter(Obligation.user_id == user_id).all()
-    registers = db.query(Register).filter(Register.user_id == user_id).all()
+    registers = db.query(Registre).filter(Registre.user_id == user_id).all()
 
     # Construire le PDF
     pdf = FPDF()

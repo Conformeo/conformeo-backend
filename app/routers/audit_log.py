@@ -1,11 +1,18 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import List
 from app.db.session import get_db
-from app.schemas.audit_log import AuditLogRead
-from app.crud import crud_audit_log
+from app.models.audit_log import AuditLog
+from app.schemas.audit_log import AuditLogRead  # À créer si pas déjà fait
+from app.dependencies.auth import get_current_active_admin, get_current_active_user
+from app.models.user import User as UserModel
 
-router = APIRouter(prefix="/audit-logs", tags=["audit_logs"])
+router = APIRouter(prefix="/auditlog", tags=["auditlog"])
 
-@router.get("/", response_model=list[AuditLogRead])
-def list_logs(user_id: int, db: Session = Depends(get_db)):
-    return crud_audit_log.list_by_user(db, user_id)
+@router.get("/", response_model=List[AuditLogRead])
+def list_logs(
+    db: Session = Depends(get_db),
+    admin: UserModel = Depends(get_current_active_admin),
+):
+    # Filtrer par tenant si besoin
+    return db.query(AuditLog).order_by(AuditLog.created_at.desc()).all()

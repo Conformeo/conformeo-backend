@@ -14,6 +14,6 @@ from .gdpr_action       import GdprAction         # noqa: F401
 from .processing_action import processing_actions # noqa: F401
 from .checklist         import Checklist          # noqa: F401
 from .checklist_item    import ChecklistItem      # noqa: F401
-from .register    import Register      # noqa: F401
+from .registre          import Registre  # Si tu as un model Registre dans registre.py
 
 # ...ajoute ici les modèles au fur et à mesure (1 par ligne)

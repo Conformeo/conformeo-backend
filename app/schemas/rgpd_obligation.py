@@ -1,3 +1,4 @@
+from pydantic import ConfigDict
 # app/schemas/rgpd_obligation.py
 from pydantic import BaseModel
 from typing import Optional
@@ -7,6 +8,7 @@ class RgpdObligationBase(BaseModel):
     label: str
     status: bool
     last_update: Optional[date]
+    model_config = ConfigDict(from_attributes=True)
 
 class RgpdObligationCreate(RgpdObligationBase):
     pass

@@ -12,23 +12,20 @@ from app.routers.checklist_items import router as items_router
 from app.routers.extinguishers import router as extinguishers_router
 from app.routers.camera import router as camera_router
 from app.routers.kits import router as kits_router
-# from app.routers.certification import router as certification_router
 from app.routers.certif import router as certif_router
 from app.routers.insurance import router as insurance_router
 from app.routers.sites import router as sites_router
 from app.routers.workers import router as workers_router
 from app.routers.duerp import router as duerp_router
 from app.routers.securite import router as securite_router
+
+# RGPD
 from app.routers.obligation import router as obligation_router
 from app.routers.rgpd_export import router as rgpd_export_router
+from app.routers.audit_log import router as audit_log_router
+from app.routers.registre import router as registre_router
+from app.routers.rgpd import router as rgpd_router      
 
-
-# RGPD Routers – NOUVEAU (utilise tes nouveaux fichiers)
-from app.routers.rgpd import router as rgpd_router      # ← Ton endpoint principal RGPD (audit, exigences, réponses, etc.)
-# (si besoin, adapte ici selon le nom de ton router principal)
-# from app.routers.rgpd_exigences import router as rgpd_exigences_router
-# from app.routers.rgpd_audit import router as rgpd_audit_router
-# from app.routers.rgpd_audit_exigence import router as rgpd_audit_exigence_router
 
 from app.routers import documents
 from app.core.config import Settings
@@ -75,14 +72,15 @@ _API_ROUTERS = [
     sites_router,
     workers_router,
     rgpd_router,
-    rgpd_export_router,                 # Nouveau router RGPD principal !
+    rgpd_export_router, 
     duerp_router,
+    registre_router,  
+    audit_log_router,
     items_router,
     securite_router,
     checklist_router,
     extinguishers_router,
     obligation_router,
-    # certification_router,
     certif_router,
     insurance_router,
     camera_router,
@@ -109,6 +107,7 @@ _ROOT_ROUTERS = [
     kits_router,
     insurance_router,
 ]
+print("SECRET_KEY ACTUELLE:", settings.SECRET_KEY)
 
 for rtr in _ROOT_ROUTERS:
     app.include_router(rtr)

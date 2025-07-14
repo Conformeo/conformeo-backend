@@ -1,3 +1,4 @@
+from pydantic import ConfigDict
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import date
@@ -11,6 +12,7 @@ class DpoBase(BaseModel):
     telephone: Optional[str] = None
     designation_date: Optional[date] = None
     is_external: bool = False
+    model_config = ConfigDict(from_attributes=True)
 
 class DpoCreate(DpoBase):
     """
@@ -27,6 +29,7 @@ class DpoUpdate(BaseModel):
     telephone: Optional[str] = None
     designation_date: Optional[date] = None
     is_external: Optional[bool] = None
+    model_config = ConfigDict(from_attributes=True)
 
 class DpoRead(DpoBase):
     """
