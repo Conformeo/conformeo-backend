@@ -9,9 +9,9 @@ from app.schemas.audit_log import AuditLogCreate
 from app.dependencies.auth import get_current_active_user
 from app.models.user import User
 
-router = APIRouter(prefix="/rgpd/registre", tags=["registres"])
+router = APIRouter(prefix="/rgpd/registre", tags=["registres"], include_in_schema=True)
 
-@router.post("/", response_model=RegistreRead)
+@router.post("", response_model=RegistreRead)
 def create_registre(
     registre_in: RegistreCreate,
     db: Session = Depends(get_db),
@@ -19,8 +19,8 @@ def create_registre(
 ):
     print(f"USER AUTH: {current_user.email}")  # <-- tu devrais voir ce print
     print("DEBUG TOKEN PAYLOAD:", payload)
-    print("DEBUG USER_ID:", user_id)
-    print("DEBUG USER:", user)
+    print("DEBUG USER_ID:", current_user.id)
+    print("DEBUG USER:", current_user)
 
     new_registre = crud_registre.create(db, registre_in, user_id=current_user.id)
     crud_audit_log.create(db, AuditLogCreate(
@@ -32,11 +32,16 @@ def create_registre(
     ))
     return new_registre
 
-@router.get("/", response_model=list[RegistreRead])
+@router.get("", response_model=list[RegistreRead])
 def list_registres(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
+    print(f"USER AUTH: {current_user.email}")  # <-- tu devrais voir ce print
+    # print("DEBUG TOKEN PAYLOAD:", payload)
+    print("DEBUG USER_ID:", current_user.id)
+    print("DEBUG USER:", current_user)
+    print("[DEBUG] Requête RGPD de:", current_user.id)
     print("USER AUTH:", current_user.email)  # doit s’afficher si ça marche
 
     return crud_registre.get_by_user(db, current_user.id)

@@ -22,6 +22,7 @@ from app.routers.securite import router as securite_router
 # RGPD
 from app.routers.obligation import router as obligation_router
 from app.routers.rgpd_export import router as rgpd_export_router
+from app.routers.rgpd_exigence import router as rgpd_exigence
 from app.routers.audit_log import router as audit_log_router
 from app.routers.registre import router as registre_router
 from app.routers.rgpd import router as rgpd_router      
@@ -73,6 +74,7 @@ _API_ROUTERS = [
     workers_router,
     rgpd_router,
     rgpd_export_router, 
+    rgpd_exigence,
     duerp_router,
     registre_router,  
     audit_log_router,
@@ -91,6 +93,7 @@ _API_ROUTERS.extend([auth_router, users_router, tenants_router])
 
 for rtr in _API_ROUTERS:
     app.include_router(rtr, prefix=API_PREFIX)
+    
 
 # Routes racine (hors préfixe /api, pour certains cas)
 _ROOT_ROUTERS = [
@@ -113,6 +116,13 @@ for rtr in _ROOT_ROUTERS:
     app.include_router(rtr)
 
 # --------  Debugging routes
+# @app.on_event("startup")
+# async def debug_routes():
+#     print("\n─── ROUTES DECLAREES ───")
+#     for r in app.routes:
+#         print(f"{r.path:40s}   {getattr(r, 'methods', None)}")
+#     print("────────────────────────\n")
+
 # @app.on_event("startup")
 # async def _debug_routes() -> None:
 #     print("\n─── Routes déclarées ───")

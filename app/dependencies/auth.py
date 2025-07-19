@@ -6,32 +6,38 @@ from jose import JWTError, jwt
 from fastapi.security import OAuth2PasswordBearer
 from app.db.session import get_db
 from app.models.user import User
-from app.core.config import settings         # IMPORTE BIEN *l'instance* settings, PAS la classe Settings !
-from app.core.security import oauth2_scheme  # doit être importé, ne pas redéfinir dans ce fichier
+from app.core.config import settings 
+from app.core.security import oauth2_scheme 
 
 # NE PAS refaire settings = Settings() ici ! On utilise celui déjà importé
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Impossible de valider les identifiants",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    print("\n=== [DEBUG] get_current_user ===")
+    print("SECRET_KEY = ", settings.SECRET_KEY)
+    print("TOKEN = ", token)
     try:
-        # DEBUG pour t'assurer que la clé est bien la même partout :
-        print("DEBUG SECRET_KEY DECODE:", settings.SECRET_KEY)
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        user_id = payload.get("user_id")
+        print("PAYLOAD = ", payload)
+        user_id: int | None = payload.get("user_id")
         if user_id is None:
+            print("Erreur : pas de user_id dans le token")
             raise credentials_exception
         user = db.query(User).filter(User.id == user_id).first()
+        print("USER EN BASE = ", user)
         if user is None:
+            print("Erreur : user non trouvé en base")
             raise credentials_exception
         return user
-    except JWTError:
+    except JWTError as e:
+        print("Erreur décodage JWT :", str(e))
         raise credentials_exception
 
 def get_current_active_user(

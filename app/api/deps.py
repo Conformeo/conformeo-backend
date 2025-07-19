@@ -1,6 +1,7 @@
 from typing import Generator
 from app.db.session import SessionLocal
 from fastapi import Depends, HTTPException, status
+
 # from app.core.security import decode_jwt  # Optionnel : si gestion JWT
 # from app.models.user import User          # Optionnel : si gestion user
 

@@ -1,8 +1,8 @@
-"""Add FK user_id to audit_logs
+"""registre timestamps
 
-Revision ID: 0a608bcc9b88
-Revises: a3acb8046226
-Create Date: 2025-07-11 16:35:27.047236
+Revision ID: 5b9f5c7394df
+Revises: 8f56329a49d5
+Create Date: 2025-07-18 14:12:52.149043
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '0a608bcc9b88'
-down_revision: Union[str, None] = 'a3acb8046226'
+revision: str = '5b9f5c7394df'
+down_revision: Union[str, None] = '8f56329a49d5'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
